@@ -217,15 +217,16 @@
       <div class="t-label">汽水音乐</div>
       <div class="t-sub">播放音乐</div>
     </div>
+    <!-- 汽水音乐无公开 scheme，通过「快捷指令」打开，见 README -->
     <div class="tile" onclick="openApp('waze')">
       <div class="t-icon">🚗</div>
       <div class="t-label">Waze</div>
       <div class="t-sub">路况导航</div>
     </div>
-    <div class="tile" onclick="showToast('长按主页键呼出 Siri\n说\"嘿 Siri 打开汽水音乐\"即可')">
-      <div class="t-icon">🎙️</div>
-      <div class="t-label">语音助手</div>
-      <div class="t-sub">Siri</div>
+    <div class="tile" onclick="openApp('shortcuts')">
+      <div class="t-icon">⚡️</div>
+      <div class="t-label">快捷指令</div>
+      <div class="t-sub">自动化</div>
     </div>
     <div class="tile" onclick="toggleFull('settings')">
       <div class="t-icon">⚙️</div>
@@ -257,7 +258,10 @@ const APPS = {
   amap:  { scheme: "iosamap://",          web: "https://ditu.amap.com/" },
   bmap:  { scheme: "baidumap://",         web: "https://map.baidu.com/" },
   waze:  { scheme: "waze://",             web: "https://www.waze.com/ul" },
-  qishui: { scheme: "qishui://",          web: null } // 汽水音乐 scheme 未确认，失败会提示
+  // 汽水音乐无公开 scheme，通过「快捷指令」App 打开（需先创建名为 Qishui 的快捷指令）
+  qishui: { scheme: "shortcuts://run-shortcut?name=Qishui", web: null,
+            miss: "未运行？请先在「快捷指令」App 新建名为 Qishui\n的快捷指令（操作=打开App→汽水音乐）" },
+  shortcuts: { scheme: "shortcuts://", web: null }
 };
 
 let lastOpened = null;
@@ -272,8 +276,8 @@ function openApp(key) {
     if (Date.now() - start >= 1400 && document.visibilityState === "visible") {
       if (app.web) {
         window.location.href = app.web;
-      } else {
-        showToast("未能打开「" + key + "」的 App\n可能未安装或链接未配置");
+      } else if (app.miss) {
+        showToast(app.miss);
       }
     }
   }, 1500);
